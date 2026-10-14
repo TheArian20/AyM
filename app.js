@@ -29,7 +29,7 @@ const canvas = $('#world'), ctx = canvas.getContext('2d');
 const garden = $('#garden-canvas'), gc = garden.getContext('2d');
 const chapters = ['universo','constelacion','jardin','tiempo','carta'];
 let width = innerWidth, height = innerHeight, dpr = 1, chapter = 'universo';
-let paused = reduceMotion.matches, time = 0, lastFrame = 0, morph = 0, morphTarget = 0;
+let paused = false, motionChosen = false, time = 0, lastFrame = 0, morph = 0, morphTarget = 0;
 let camera = {x:0,y:0}, pointer = {x:0,y:0}, rotation = 0, zoom = 1, dragging = false, dragX = 0;
 let flowers = [], chosenHue = 340, selectedStar = -1, transitioning = false;
 let letterTimers = [], letterOpened = false, letterComplete = false, saveTimer;
@@ -66,9 +66,10 @@ function resize(){
 }
 
 function draw(dt){
-  if(!paused)time+=dt;
-  camera.x=lerp(camera.x,pointer.x,paused?1:Math.min(1,dt*2));
-  camera.y=lerp(camera.y,pointer.y,paused?1:Math.min(1,dt*2));
+  if(!paused)time+=dt*(reduceMotion.matches&&!motionChosen?.35:1);
+  const driftX=Math.sin(time*.27)*.3,driftY=Math.cos(time*.21)*.2;
+  camera.x=lerp(camera.x,pointer.x+driftX,paused?0:Math.min(1,dt*2));
+  camera.y=lerp(camera.y,pointer.y+driftY,paused?0:Math.min(1,dt*2));
   morph=lerp(morph,morphTarget,paused?1:Math.min(1,dt*1.5));
   ctx.clearRect(0,0,width,height);
   const mobile=width<700,cx=width*(mobile?.64:.71),cy=height*(mobile?.54:.49);
@@ -91,9 +92,9 @@ function drawGalaxy(cx,cy,mobile){
   ctx.globalAlpha=fade;ctx.globalCompositeOperation='lighter';
   ctx.drawImage(mistTexture,-radius*1.1,-radius*.72,radius*2.2,radius*1.44);
   for(const p of particles){
-    const a=p.arm*Math.PI/2+p.r*7.6+p.scatter+time*.028+rotation;
+    const a=p.arm*Math.PI/2+p.r*7.6+p.scatter+time*.1+rotation;
     const spiral=[Math.cos(a)*p.r,Math.sin(a)*p.r,p.z*(1-p.r)*.075];
-    const orbitA=p.a+time*.08+rotation;
+    const orbitA=p.a+time*.16+rotation;
     const orbit=[Math.cos(orbitA)*(.36+p.r*.48),Math.sin(orbitA)*(.36+p.r*.48),p.z*.2];
     const ha=p.a+rotation*.1,hx=16*Math.pow(Math.sin(ha),3)/18,hy=-(13*Math.cos(ha)-5*Math.cos(2*ha)-2*Math.cos(3*ha)-Math.cos(4*ha))/18;
     const heart=[hx*Math.sqrt(p.r),hy*Math.sqrt(p.r),p.z*.08];
@@ -185,7 +186,7 @@ function drawGarden(dt){
     if(!paused)f.age+=dt;
     const grow=1-Math.pow(1-clamp(f.age/2,0,1),3),open=1-Math.pow(1-clamp((f.age-.45)/1.8,0,1),3);
     const bx=width*(left+f.x*span),by=ground+f.depth*height*.035;
-    const stem=height*(mobile?.15:.25)*f.length*grow,sway=Math.sin(time*.6+f.phase)*7*f.depth+camera.x*3;
+    const stem=height*(mobile?.15:.25)*f.length*grow,sway=Math.sin(time*.9+f.phase)*(8+f.depth*9)+camera.x*6;
     const flowerX=bx+sway+f.bend*stem*.1,flowerY=by-stem;
     gc.save();gc.lineWidth=2+f.depth*1.6;
     const sg=gc.createLinearGradient(bx-2,0,bx+3,0);sg.addColorStop(0,'#324c3c');sg.addColorStop(.5,'#71816a');sg.addColorStop(1,'#283e32');gc.strokeStyle=sg;
@@ -338,7 +339,11 @@ music.addEventListener('error', musicError);
 updateSound();
 $('#sound').onclick=toggleSound;
 function updateMotion(){document.body.classList.toggle('paused',paused);$('#motion').textContent=paused?'▷':'Ⅱ';$('#motion').setAttribute('aria-label',paused?'Reanudar movimiento':'Pausar movimiento');$('#motion').setAttribute('aria-pressed',String(paused));if(paused&&letterOpened&&!letterComplete)revealLetter(true);}
-$('#motion').onclick=()=>{paused=!paused;updateMotion();};reduceMotion.addEventListener('change',e=>{paused=e.matches;updateMotion();});
+$('#motion').onclick=()=>{motionChosen=true;paused=!paused;updateMotion();};
+// La preferencia del dispositivo suaviza el movimiento, sin congelar la página.
+// addListener mantiene compatibilidad con versiones antiguas de Safari.
+if(reduceMotion.addEventListener)reduceMotion.addEventListener('change',updateMotion);
+else if(reduceMotion.addListener)reduceMotion.addListener(updateMotion);
 
 document.addEventListener('pointermove',e=>{
   if(paused)return;pointer.x=(e.clientX/width-.5)*2;pointer.y=(e.clientY/height-.5)*2;
