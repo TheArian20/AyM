@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090e12"><meta name="description" content="Michelle y Arian. Un universo íntimo de estrellas, gerberas y palabras.">
+  <title>Para Michelle — Donde todo florece</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="world" aria-hidden="true"></canvas><div class="vignette" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
+  <header><a href="#universo" class="monogram" aria-label="Inicio: Michelle y Arian">M<span> / </span>A</a><span class="edition">UNA DEDICATORIA DE ARIAN A MICHELLE</span><div class="header-actions"><button id="sound" class="icon-button" aria-pressed="false"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="sound-label">Sonido apagado</span></button><button id="motion" class="icon-button" aria-pressed="false" aria-label="Pausar movimiento">Ⅱ</button></div></header>
+  <main>
+    <section id="universo" class="chapter active" aria-labelledby="universe-title">
+      <div class="chapter-copy"><p class="eyebrow"><span class="dash"></span> 01 — EL ENCUENTRO</p><h1 id="universe-title">De todos<br>los universos,<br><em>el tuyo.</em></h1><p class="lead">Michelle, hay encuentros que cambian<br>la forma de mirar todo lo demás.</p><button class="action" id="begin">Encontrar nuestra constelación <span>↗</span></button><div class="origin"><span class="origin-date">09.07.2026</span><span class="origin-divider"></span><span id="days">Nuestro comienzo</span></div></div>
+      <div class="orbital-label" aria-hidden="true"><span>MICHELLE & ARIAN</span><span>UN MISMO CIELO</span></div>
+      <div class="view-controls"><span>CONTEMPLAR</span><button class="view active" data-view="galaxy" aria-pressed="true">Galaxia</button><button class="view" data-view="orbit" aria-pressed="false">Órbita</button><button class="view" data-view="heart" aria-pressed="false">Latido</button></div>
+      <p class="interaction-hint">Mueve el cursor · Arrastra para cambiar la perspectiva</p>
+    </section>
+    <section id="constelacion" class="chapter" hidden aria-labelledby="constellation-title">
+      <div class="chapter-copy compact"><p class="eyebrow"><span class="dash"></span> 02 — LO QUE NOS UNE</p><h2 id="constellation-title">No es el cielo.<br>Es lo que <em>conectamos.</em></h2><p class="lead">Cinco estrellas. Cinco maneras de decirte<br>por qué quise hacer esto para ti.</p><div class="discovery"><span id="discovery-count">0 / 5</span><div class="progress-track"><span id="discovery-progress"></span></div><small>ESTRELLAS DESCUBIERTAS</small></div><button class="text-button" data-go="jardin">Seguir hacia tus gerberas <span>→</span></button></div>
+      <div id="constellation-stars" aria-label="Las cinco estrellas de nuestra constelación"></div>
+      <aside id="star-detail" class="star-detail" hidden aria-labelledby="star-title"><button id="close-star" class="close-button" aria-label="Cerrar dedicatoria">×</button><p class="eyebrow" id="star-number">ESTRELLA 01</p><h3 id="star-title"></h3><p id="star-text"></p><button id="next-star" class="text-button">Descubrir la siguiente <span>↗</span></button></aside>
+      <p id="constellation-hint" class="interaction-hint" aria-live="polite">Elige una estrella para descubrir su dedicatoria.</p>
+    </section>
+    <section id="jardin" class="chapter" hidden aria-labelledby="garden-title">
+      <div class="chapter-copy compact garden-copy"><p class="eyebrow"><span class="dash"></span> 03 — TUS FLORES</p><h2 id="garden-title">Un jardín<br>con tu <em>nombre.</em></h2><p class="lead">Gerberas, porque son tus favoritas.<br>Este rincón del universo tenía que ser tuyo.</p><div class="palette" role="group" aria-label="Color de las gerberas"><button class="swatch active" data-hue="340" style="--swatch:#f32387" aria-label="Fucsia" aria-pressed="true"></button><button class="swatch" data-hue="20" style="--swatch:#ff7617" aria-label="Naranja" aria-pressed="false"></button><button class="swatch" data-hue="43" style="--swatch:#ffcf08" aria-label="Amarillo" aria-pressed="false"></button><button class="swatch" data-hue="ivory" style="--swatch:#f9f8f2" aria-label="Blanco" aria-pressed="false"></button><span id="color-name">FUCSIA</span></div><button id="bouquet" class="action">Hacer florecer un ramo <span>✳</span></button><div class="garden-actions"><button id="save-garden" class="text-button">Guardar este jardín ↗</button><button id="clear-garden" class="text-button">Empezar de nuevo</button></div><p id="garden-status" class="micro" aria-live="polite"></p></div>
+      <canvas id="garden-canvas" role="img" aria-label="Jardín de gerberas: toca o haz clic en la zona a la derecha para sembrar. También puedes usar el botón Hacer florecer un ramo."></canvas>
+      <div class="botanical-label"><span>GERBERA</span><i>Un gesto que florece.</i></div><p class="interaction-hint" id="garden-hint">Toca el jardín para plantar · Tu ramo se conserva en este navegador</p>
+    </section>
+    <section id="tiempo" class="chapter" hidden aria-labelledby="time-title">
+      <div class="time-layout"><div><p class="eyebrow"><span class="dash"></span> 04 — NUESTRO TIEMPO</p><h2 id="time-title">Hay fechas.<br>Y hay <em>comienzos.</em></h2><p class="lead">El nuestro tiene un lugar en el calendario.<br>Lo que viene, lo seguimos escribiendo.</p></div><div class="time-piece"><p class="micro">DESDE EL 9 DE JULIO DE 2026</p><div class="day-number" id="elapsed-days">0</div><span class="day-caption">días desde nuestro comienzo</span><div class="clock"><div><b id="elapsed-hours">00</b><span>HORAS</span></div><i>:</i><div><b id="elapsed-minutes">00</b><span>MINUTOS</span></div><i>:</i><div><b id="elapsed-seconds">00</b><span>SEGUNDOS</span></div></div><div class="time-rule"><span>09 JUL 2026</span><span id="today-label"></span></div><button class="text-button" data-go="carta">Hay algo más que quiero decirte <span>→</span></button></div></div>
+    </section>
+    <section id="carta" class="chapter" hidden aria-labelledby="letter-title">
+      <div class="letter-layout"><div class="letter-heading"><p class="eyebrow"><span class="dash"></span> 05 — PARA TI</p><h2 id="letter-title">Lo que ninguna<br>estrella podría<br><em>decirte por mí.</em></h2><p class="lead">Sin prisa. Sin ruido.<br>Solo unas palabras para ti.</p><span class="letter-date">ARIAN · 09 JULIO 2026</span></div><div class="letter-paper"><div id="letter-sealed"><span class="paper-overline">UNA CARTA PERSONAL</span><span class="recipient">Michelle.</span><div class="wax-seal" aria-hidden="true">A</div><button id="open-letter" class="paper-button">Abrir la carta <span>↗</span></button></div><article id="letter-content" hidden><span class="paper-overline">MI QUERIDA MICHELLE</span><div id="letter-paragraphs"></div><div class="letter-signature"><span>Con amor,</span><em>Arian</em></div><button id="read-all" class="paper-button">Mostrar la carta completa</button></article></div></div>
+    </section>
+  </main>
+  <footer><div class="footer-caption"><span id="chapter-number">01 / 05</span><span>DONDE TODO FLORECE</span></div><nav aria-label="Capítulos de la dedicatoria"><button class="nav active" data-go="universo" aria-current="page"><span>01</span> Universo</button><button class="nav" data-go="constelacion"><span>02</span> Constelación</button><button class="nav" data-go="jardin"><span>03</span> Gerberas</button><button class="nav" data-go="tiempo"><span>04</span> Tiempo</button><button class="nav" data-go="carta"><span>05</span> Carta</button></nav><button id="next-chapter" class="next-chapter" aria-label="Ir al siguiente capítulo">→</button></footer>
+  <div id="transition" aria-hidden="true"><span>M <i>&</i> A</span></div>
+  <noscript><p class="no-script">Activa JavaScript para recorrer la galaxia y el jardín de Michelle.</p></noscript>
+  <script src="app.js"></script>
+</body>
+</html>
