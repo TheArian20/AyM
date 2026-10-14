@@ -12,3 +12,12 @@
 @keyframes ambient-float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
 @keyframes seal-glow { 0%,100% { box-shadow:0 4px 8px #3d1f2530,inset 0 0 0 6px #ffffff0c; } 50% { box-shadow:0 8px 24px #8e555855,inset 0 0 0 6px #ffffff18; } }
 @keyframes border-breathe { 0%,100% { border-color:#cfbc9827; } 50% { border-color:#cfbc9860; } }
+
+/* Capa ambiental independiente del bucle Canvas. */
+.ambient-orbs{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.ambient-orbs i{position:absolute;width:48vw;height:48vw;right:-9%;top:23%;border-radius:50%;background:radial-gradient(ellipse,#34576828,transparent 65%);animation:nebula-drift 12s ease-in-out infinite alternate!important}
+.ambient-orbs i:nth-child(2){width:36vw;height:36vw;right:20%;top:43%;background:radial-gradient(ellipse,#80537225,transparent 65%);animation-delay:-6s!important}
+@keyframes nebula-drift{from{transform:translate(-20px,-16px) scale(.85);opacity:.45}to{transform:translate(30px,25px) scale(1.2);opacity:1}}
+body.paused .ambient-orbs i{animation-play-state:paused!important}
+@media(max-width:700px){.ambient-orbs i{width:100vw;height:100vw;top:44%}.ambient-orbs i:nth-child(2){width:80vw;height:80vw;top:53%}.chapter-copy{top:13%}#universo h1{font-size:clamp(49px,13vw,64px)}#universo .lead{margin:15px 0}#universo .origin{margin-top:17px}.view-controls{bottom:16%}.interaction-hint{bottom:10.5%}}
+@media(prefers-reduced-motion:reduce){.ambient-orbs i{animation-duration:24s!important}}

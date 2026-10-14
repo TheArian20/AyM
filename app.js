@@ -36,7 +36,7 @@ let letterTimers = [], letterOpened = false, letterComplete = false, saveTimer;
 const visited = new Set();
 const STORAGE = 'michelle-arian-garden-v2';
 const SEEN = 'michelle-arian-stars-v2';
-const particles = Array.from({length: width < 700 ? 2100 : 3800}, (_,i) => ({
+const particles = Array.from({length: width < 700 ? 1100 : 2800}, (_,i) => ({
   r: Math.pow(Math.random(),.65), a:random(0,Math.PI*2), arm:i%4,
   scatter:random(-.24,.24), z:random(-1,1), size:random(.4,1.65), phase:random(0,Math.PI*2)
 }));
@@ -59,20 +59,20 @@ mistTexture = createMist();
 function positions(){return width<700 ? [[.29,.48],[.62,.44],[.82,.55],[.61,.69],[.25,.66]] : [[.53,.35],[.72,.24],[.87,.41],[.76,.62],[.54,.59]];}
 
 function resize(){
-  width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);
+  width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,width<700?1.25:2);
   for(const c of [canvas,garden]){c.width=Math.round(width*dpr);c.height=Math.round(height*dpr);c.getContext('2d').setTransform(dpr,0,0,dpr,0,0);}
   $$('.star').forEach((s,i)=>{const p=positions()[i];s.style.left=(p[0]*100).toFixed(2)+'%';s.style.top=(p[1]*100).toFixed(2)+'%';});
   draw(0);
 }
 
 function draw(dt){
-  if(!paused)time+=dt*(reduceMotion.matches&&!motionChosen?.35:1);
+  if(!paused)time+=dt*(reduceMotion.matches&&!motionChosen?.65:1);
   const driftX=Math.sin(time*.27)*.3,driftY=Math.cos(time*.21)*.2;
   camera.x=lerp(camera.x,pointer.x+driftX,paused?0:Math.min(1,dt*2));
   camera.y=lerp(camera.y,pointer.y+driftY,paused?0:Math.min(1,dt*2));
   morph=lerp(morph,morphTarget,paused?1:Math.min(1,dt*1.5));
   ctx.clearRect(0,0,width,height);
-  const mobile=width<700,cx=width*(mobile?.64:.71),cy=height*(mobile?.54:.49);
+  const mobile=width<700,cx=width*(mobile?.57:.71),cy=height*(mobile?.68:.49);
   const ambient=ctx.createRadialGradient(cx,cy,0,cx,cy,width*.65);
   ambient.addColorStop(0,chapter==='jardin'?'#25453835':'#33465230');ambient.addColorStop(1,'#090e1200');
   ctx.fillStyle=ambient;ctx.fillRect(0,0,width,height);
@@ -84,15 +84,26 @@ function draw(dt){
   if(chapter==='universo'||chapter==='tiempo'||chapter==='carta')drawGalaxy(cx,cy,mobile);
   if(chapter==='constelacion')drawConstellation();
   if(chapter==='jardin')drawGarden(dt);
+  // Estrellas viajeras visibles también sin usar cursor o tocar la pantalla.
+  ctx.save();
+  for(let i=0;i<3;i++){
+    const cycle=(time*.16+i*.33)%1;
+    const x=width*(.08+cycle*.85),y=height*(.6+i*.065)-Math.sin(cycle*Math.PI)*height*.08;
+    const trail=ctx.createLinearGradient(x-40,y+14,x,y);
+    trail.addColorStop(0,'#dfcba200');trail.addColorStop(1,'#dfcba2b0');
+    ctx.strokeStyle=trail;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x-40,y+14);ctx.lineTo(x,y);ctx.stroke();
+    ctx.fillStyle='#ead8b5';ctx.beginPath();ctx.arc(x,y,1.6,0,7);ctx.fill();
+  }
+  ctx.restore();
 }
 
 function drawGalaxy(cx,cy,mobile){
-  const fade=chapter==='universo'?1:.22,radius=Math.min(width*(mobile?.73:.44),height*.67)*zoom;
+  const fade=chapter==='universo'?1:.35,radius=Math.min(width*(mobile?.62:.44),height*.67)*zoom;
   ctx.save();ctx.translate(cx+camera.x*18,cy+camera.y*12);ctx.rotate(-.38+rotation*.08);
   ctx.globalAlpha=fade;ctx.globalCompositeOperation='lighter';
   ctx.drawImage(mistTexture,-radius*1.1,-radius*.72,radius*2.2,radius*1.44);
   for(const p of particles){
-    const a=p.arm*Math.PI/2+p.r*7.6+p.scatter+time*.1+rotation;
+    const a=p.arm*Math.PI/2+p.r*7.6+p.scatter+time*.2+rotation;
     const spiral=[Math.cos(a)*p.r,Math.sin(a)*p.r,p.z*(1-p.r)*.075];
     const orbitA=p.a+time*.16+rotation;
     const orbit=[Math.cos(orbitA)*(.36+p.r*.48),Math.sin(orbitA)*(.36+p.r*.48),p.z*.2];
@@ -130,6 +141,8 @@ function drawConstellation(){
     if(visited.has(i)&&visited.has((i+1)%5)){
       ctx.setLineDash([]);ctx.strokeStyle='#c4ad8180';ctx.stroke();ctx.setLineDash([3,7]);ctx.strokeStyle='#c4ad8140';
     }
+    const travel=(time*.22+i*.2)%1;
+    ctx.fillStyle='#ead6ac';ctx.beginPath();ctx.arc(lerp(a[0],b[0],travel)*width,lerp(a[1],b[1],travel)*height,2,0,7);ctx.fill();
   }
   ctx.setLineDash([]);
   for(let i=0;i<5;i++){
@@ -357,7 +370,20 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden)music.pause();
   else if(audioOn)music.play().catch(musicError);
 });
-function frame(now){const dt=lastFrame?Math.min((now-lastFrame)/1000,.05):0;lastFrame=now;if(!document.hidden)draw(dt);requestAnimationFrame(frame);}
-loadPersonalState();updateProgress();updateMotion();updateClock();setInterval(updateClock,1000);resize();
+let animationErrorReported=false;
+function frame(now){
+  // Programar primero: un fallo puntual nunca cancela los fotogramas siguientes.
+  requestAnimationFrame(frame);
+  const dt=lastFrame?Math.min((now-lastFrame)/1000,.08):0;lastFrame=now;
+  if(document.hidden)return;
+  try{draw(dt);}catch(error){
+    if(!animationErrorReported){console.error('No se pudo dibujar la animación:',error);animationErrorReported=true;}
+  }
+}
+// El bucle no depende de audio, calendario ni almacenamiento.
+requestAnimationFrame(frame);
+loadPersonalState();updateProgress();updateMotion();
+try{updateClock();}catch(error){console.warn('Calendario no disponible:',error);}
+setInterval(()=>{try{updateClock();}catch{}},1000);resize();
 const initial=location.hash.slice(1);if(chapters.includes(initial))showChapter(initial);
-addEventListener('resize',resize);requestAnimationFrame(frame);
+addEventListener('resize',resize);
